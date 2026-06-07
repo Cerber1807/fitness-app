@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'; // Добавили u
 import axios from 'axios';
 import ExerciseList from './ExerciseList';
 
-const API_URL = 'http://127.0.0.1:5000'; // Убедитесь, что URL правильный и соответствует вашему серверу
+const API_URL = 'https://fitness-app-production-e276.up.railway.app'; // Убедитесь, что URL правильный и соответствует вашему серверу
 
 const Profile = () => {
     const [user, setUser] = useState(null);

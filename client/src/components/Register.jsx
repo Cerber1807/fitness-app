@@ -19,7 +19,7 @@ const Register = () => {
     const handleRegister = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('http://localhost:5000/register', formData);
+            await axios.post('https://fitness-app-production-e276.up.railway.app', formData);
             alert("Регистрация успешна! теперь войдите.");
             navigate('/');
         } catch (err) {

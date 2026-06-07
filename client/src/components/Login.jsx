@@ -10,7 +10,7 @@ const Login = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post('http://localhost:5000/login', { email, password });
+            const res = await axios.post('https://fitness-app-production-e276.up.railway.app', { email, password });
             
             // Сохраняем токен и ID пользователя
             localStorage.setItem('token', res.data.token);

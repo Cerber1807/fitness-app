@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 
-const API_URL = 'http://127.0.0.1:5000';
+const API_URL = 'https://fitness-app-production-e276.up.railway.app';
 
 const gifMap = {
     'Классические отжимания': 'https://media.giphy.com/media/lHWkyjY10OaWGdiHTz/giphy.gif',
