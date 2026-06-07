@@ -6,9 +6,20 @@ const pool = require('./db');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const HOST = process.env.HOST || '0.0.0.0'; // Слушаем все интерфейсы в облаке
 
 app.use(cors());
 app.use(express.json());
+
+// ГЛОБАЛЬНЫЙ ПЕРЕХВАТ ОШИБОК ДЛЯ ВЫВОДА В ЛОГИ RAILWAY
+process.on('uncaughtException', (err) => {
+    console.error('КРИТИЧЕСКАЯ ОШИБКА НА СТАРТЕ:', err.stack);
+    process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('НЕОБРАБОТАННОЕ ИСКЛЮЧЕНИЕ:', reason);
+});
 
 // ФУНКЦИЯ ДЛЯ ПРОВЕРКИ ТОКЕНА (Middleware)
 const authenticateToken = (req, res, next) => {
@@ -307,6 +318,7 @@ app.delete('/exercises/:id', authenticateToken, async (req, res) => {
         res.status(500).send("Ошибка удаления");
     }
 });
+
 // Получение ОБЩЕГО списка упражнений из каталога (без токена)
 app.get('/all-exercises', async (req, res) => {
     try {
@@ -404,3 +416,13 @@ const initDatabase = async () => {
         process.exit(1);
     }
 };
+
+// --- ФИНАЛЬНЫЙ ЗАПУСК СЕРВЕРА (ЭТОГО НЕ БЫЛО) ---
+const startServer = async () => {
+    await initDatabase(); // Сначала создаем/проверяем таблицы в базе
+    app.listen(PORT, HOST, () => {
+        console.log(`Сервер успешно запущен на порту ${PORT} (Интерфейс: ${HOST})`);
+    });
+};
+
+startServer();
