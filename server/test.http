@@ -1,0 +1,38 @@
+POST http://localhost:5000/register
+Content-Type: application/json
+
+{
+  "username": "Marsel132",
+  "email": "marselsoska@test.com",
+  "password": "my_secure_password",
+  "height": 180,
+  "weight": 75
+}
+###
+POST http://localhost:5000/login
+Content-Type: application/json
+
+{
+  "email": "marselsoska@test.com",
+  "password": "my_secure_password"
+}
+###
+GET http://localhost:5000/profile/9
+###
+GET http://localhost:5000/profile/9
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OSwiaWF0IjoxNzc1NzEyNzAwLCJleHAiOjE3NzU3MTYzMDB9.9xFpvehpxLG6yHmL1P-hCkjiQGwOl_4YH3sW1eg8nPo
+### Добавить упражнение
+POST http://localhost:5000/exercises
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OSwiaWF0IjoxNzc1NzEyNzAwLCJleHAiOjE3NzU3MTYzMDB9.9xFpvehpxLG6yHmL1P-hCkjiQGwOl_4YH3sW1eg8nPo
+Content-Type: application/json
+
+{
+    "exercise_name": "Жим лежа",
+    "sets": 3,
+    "reps": 10,
+    "weight_lifted": 60
+}
+
+### Получить мои упражнения
+GET http://localhost:5000/exercises
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OSwiaWF0IjoxNzc1NzEyNzAwLCJleHAiOjE3NzU3MTYzMDB9.9xFpvehpxLG6yHmL1P-hCkjiQGwOl_4YH3sW1eg8nPo
