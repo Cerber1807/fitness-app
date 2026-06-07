@@ -358,11 +358,13 @@ app.get('/workout-history', authenticateToken, async (req, res) => {
 const initDatabase = async () => {
     try {
         await pool.query(`
-            CREATE TABLE IF NOT EXISTS workout_history (
+            CREATE TABLE IF NOT EXISTS users (
                 id SERIAL PRIMARY KEY,
-                user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-                exercise_name VARCHAR(255) NOT NULL,
-                completed_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+                username VARCHAR(100) NOT NULL,
+                email VARCHAR(100) UNIQUE NOT NULL,
+                password VARCHAR(255) NOT NULL,
+                height INTEGER,
+                weight INTEGER,
                 created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
             )
         `);
@@ -387,197 +389,18 @@ const initDatabase = async () => {
                 created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
             )
         `);
-        console.log('Таблицы workout_history, exercise_catalog и user_exercises проверены/созданы.');
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS workout_history (
+                id SERIAL PRIMARY KEY,
+                user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                exercise_name VARCHAR(255) NOT NULL,
+                completed_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+                created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        console.log('Все таблицы проверены/созданы.');
     } catch (err) {
         console.error('Ошибка инициализации базы данных:', err.message);
         process.exit(1);
     }
 };
-
-const seedExerciseCatalog = async () => {
-    const fullExercisePack = [
-        {
-            name: 'Вращение плечами',
-            target_muscle: 'Суставы плеч, Грудь, Верх спины',
-            category: 'Разминка',
-            description: 'Плавные круговые движения руками вперед и назад для разогрева плечевых суставов перед нагрузкой.',
-            image_url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdGI1eDJuOWE5cWtscGxzcmxldGNqeTF1b29ydGI1NDc0bWJuMXRtYiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/kHa1N17eGv1tWMBQqA/giphy.gif'
-        },
-        {
-            name: 'Разогрев запястий и кистей',
-            target_muscle: 'Запястья, Предплечья',
-            category: 'Разминка',
-            description: 'Вращения кистями в замке и легкие растягивающие движения. КРИТИЧЕСКИ важно перед позой лягушки и стойками!',
-            image_url: 'https://artimg.gympik.com/articles/wp-content/uploads/2019/04/2019-04-24.gif'
-        },
-        {
-            name: 'Прыжки "Джампинг Джек"',
-            target_muscle: 'Все тело, Кардио-разогрев',
-            category: 'Разминка',
-            description: 'Интенсивные прыжки с разведением рук и ног для поднятия пульса и общей подготовки организма к тренировке.',
-            image_url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMDltMDRnZGUxd21vNmR3ZnQ0ODZobWJsZ21xaHJwemx5OGl2cXpqbCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/WgViBJUWQMEeu5Jvmd/giphy.gif'
-        },
-        {
-            name: 'Поза лягушки (Frog Stand)',
-            target_muscle: 'Плечи, Мышцы кора, Запястья',
-            category: 'Руки',
-            description: 'Статический баланс на руках со согнутыми локтями и упором коленей в трицепс. Базовая статика в калистенике.',
-            image_url: 'https://media.giphy.com/media/CmnQ7MrEbH75jAFkH3/giphy.gif'
-        },
-        {
-            name: 'Пиковые отжимания',
-            target_muscle: 'Плечи (Дельты), Трицепс',
-            category: 'Руки',
-            description: 'Отжимания домиком с поднятым тазом. Переносят вес тела на плечи, подготавливая к отжиманиям в стойке.',
-            image_url: 'https://media.giphy.com/media/nT9u7Rm4zQvmrcCSWF/giphy.gif'
-        },
-        {
-            name: 'Классические подтягивания',
-            target_muscle: 'Широчайшие спины, Бицепс, Хват',
-            category: 'Руки',
-            description: 'Базовое движение на турнике для мощной спины и проработки двуглавой мышцы плеча.',
-            image_url: 'https://media.giphy.com/media/K55x1hsxRuqdniXhXH/giphy.gif'
-        },
-        {
-            name: 'Австралийские подтягивания',
-            target_muscle: 'Верх спины, Ромбовидные, Бицепс',
-            category: 'Руки',
-            description: 'Горизонтальные подтягивания на низкой перекладине. Отличное упражнение для контроля осанки и рельефа.',
-            image_url: 'https://media.giphy.com/media/WB4AIcJh76pWq2W5wn/giphy.gif'
-        },
-        {
-            name: 'Отжимания на брусьях',
-            target_muscle: 'Трицепс, Нижняя часть груди',
-            category: 'Руки',
-            description: 'Мощное многосуставное упражнение для прокачки всей толкающей группы мышц рук и плечевого пояса.',
-            image_url: 'https://media.giphy.com/media/RGmBAQjoy8Hnkuq1Hk/giphy.gif'
-        },
-        {
-            name: 'Классические отжимания',
-            target_muscle: 'Грудь, Трицепс, Кора',
-            category: 'Грудь',
-            description: 'Фундаментальное упражнение на полу. Держи тело ровно, опускайся до касания грудью пола.',
-            image_url: 'https://media.giphy.com/media/SX9pF45td2gIniqSBm/giphy.gif'
-        },
-        {
-            name: 'Алмазные отжимания',
-            target_muscle: 'Внутренняя часть груди, Трицепс',
-            category: 'Грудь',
-            description: 'Отжимания с узкой постановкой рук, где ладони образуют треугольник (алмаз). Смещает акцент на трицепс.',
-            image_url: 'https://media.giphy.com/media/4XGl3yPyvnWCFfTaYV/giphy.gif'
-        },
-        {
-            name: 'Приседания с выпрыгиванием',
-            target_muscle: 'Квадрицепс, Ягодицы, Взрывная сила',
-            category: 'Ноги',
-            description: 'Плиометрическое упражнение: глубокий присед с последующим максимально мощным выпрыгиванием вверх.',
-            image_url: 'https://media.giphy.com/media/yxH3qXZsBWgkiuk7e6/giphy.gif'
-        },
-        {
-            name: 'Выпады на месте',
-            target_muscle: 'Ягодицы, Бицепс бедра, Квадрицепс',
-            category: 'Ноги',
-            description: 'Шаг вперед с удержанием равновесия. Следи, чтобы колено впереди стоящей ноги не выходило за носок.',
-            image_url: 'https://media.giphy.com/media/BpCFzJw6Pl5HuggQCo/giphy.gif'
-        },
-        {
-            name: 'Планка',
-            target_muscle: 'Прямая мышца живота, Кора, Плечи',
-            category: 'Пресс',
-            description: 'Статическое удержание тела в упоре лёжа на предплечьях. Держи тело прямым как доска, не прогибай поясницу.',
-            image_url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYnYzNzA0N245NjRmOW0xZjJpZ24zdmJ5OHZhbnEzeXJ6dm93OHpiZyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/CLjw2mHysNEYw/giphy.gif'
-        },
-        {
-            name: 'Скручивания',
-            target_muscle: 'Прямая мышца живота',
-            category: 'Пресс',
-            description: 'Классические кранчи лёжа на спине. Поднимай только лопатки, не тяни шею руками.',
-            image_url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaDRtbDk0ejM0aXNwZXFoNGc0bnFoM3duOXU2enF5MWwwYTFmOGp4cCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/jpt34EMgjiitZKb3ds/giphy.gif'
-        },
-        {
-            name: 'Подъём ног лёжа',
-            target_muscle: 'Нижний пресс, Сгибатели бедра',
-            category: 'Пресс',
-            description: 'Лёжа на спине поднимай прямые ноги до 90 градусов и медленно опускай. Поясница прижата к полу.',
-            image_url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMHc1eDFzcWN0YXZvMHBmczE2dTcyeXo3NHFnZG1mbnY0dWcweGdqZCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/uOhYjZ6JpY3yRdawOS/giphy.gif'
-        },
-        {
-            name: 'Велосипед',
-            target_muscle: 'Косые мышцы живота, Пресс',
-            category: 'Пресс',
-            description: 'Лёжа на спине поочерёдно тяни локоть к противоположному колену. Одно из лучших упражнений на косые мышцы.',
-            image_url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExeDR0ZzlhZHJqMWprdWZtNWxpOXRyZWNjYW5jd3Z2enVuYmVhYXVyaiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/TMNCtgJGJnV8k/giphy.gif'
-        },
-        {
-            name: 'Горная тропа (Mountain Climbers)',
-            target_muscle: 'Пресс, Кора, Кардио',
-            category: 'Пресс',
-            description: 'В упоре лёжа поочерёдно подтягивай колени к груди в быстром темпе. Совмещает кардио и работу пресса.',
-            image_url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdHl5NmgyMmNpZjdqOGpiaXJienU5OWF0bXVkbTNxYTAyb2U0Z21teiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/l3vR3kl8djhC3OF32/giphy.gif'
-        },
-        {
-            name: 'Боковая планка',
-            target_muscle: 'Косые мышцы живота, Кора',
-            category: 'Пресс',
-            description: 'Удержание тела в боковом упоре на предплечье. Таз не опускай, тело должно быть прямой линией.',
-            image_url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHNmYmtrYXd1N3cxcTJ4dGMyaW5oemkwdm92MGxlMTlmcmE1enZ1aiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/Ws9dUXg0RjsylJkauy/giphy.gif'
-        },
-        {
-            name: 'Отжимания в стойке на руках у стены',
-            target_muscle: 'Дельты, Трицепс, Кора',
-            category: 'Плечи',
-            description: 'Стойка на руках у стены с отжиманиями. Мощное упражнение для массы плеч. Начинай с удержания стойки.',
-            image_url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExeHpmY3RhaXlmcndvNDY1N3J5dGtnZ3hndXVnOGNhZWE2dmZ1Y2xvbyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/xThta8ZR0THqoBOOTC/giphy.gif'
-        },
-        {
-            name: 'Пайк отжимания',
-            target_muscle: 'Передние дельты, Трицепс',
-            category: 'Плечи',
-            description: 'Отжимания в позиции домиком — таз высоко поднят, голова смотрит вниз. Подготовительное к стойке на руках.',
-            image_url: 'https://media.giphy.com/media/nT9u7Rm4zQvmrcCSWF/giphy.gif'
-        },
-        {
-            name: 'Разведение рук в планке',
-            target_muscle: 'Средние дельты, Кора, Стабилизаторы',
-            category: 'Плечи',
-            description: 'Из положения планки поочерёдно поднимай прямую руку в сторону до уровня плеча. Таз не крути.',
-            image_url: 'https://goodlooker.ru/wp-content/uploads/2020/08/Vrashenie_rukoj_v_planke_2.gif'
-        },
-        {
-            name: 'Отжимания с поворотом',
-            target_muscle: 'Плечи, Грудь, Косые мышцы',
-            category: 'Плечи',
-            description: 'После каждого отжимания поворачивай корпус и поднимай руку вверх. Развивает подвижность плечевого пояса.',
-            image_url: 'https://d39ziaow49lrgk.cloudfront.net/wp-content/uploads/2015/07/Push_Up_6.gif'
-        },
-        {
-            name: 'Обратные отжимания от скамьи',
-            target_muscle: 'Задние дельты, Трицепс',
-            category: 'Плечи',
-            description: 'Руки на скамье сзади, ноги впереди. Сгибай локти опуская таз вниз. Хорошо прорабатывает задний пучок дельт.',
-            image_url: 'https://media.giphy.com/media/RGmBAQjoy8Hnkuq1Hk/giphy.gif'
-        }
-    ];
-
-    try {
-        for (const exercise of fullExercisePack) {
-            await pool.query(
-                `INSERT INTO exercise_catalog (name, target_muscle, category, description, image_url)
-                 VALUES ($1::text, $2::text, $3::text, $4::text, $5::text)
-                 ON CONFLICT (name) DO NOTHING`,
-                [exercise.name, exercise.target_muscle, exercise.category, exercise.description, exercise.image_url]
-            );
-        }
-        console.log('Сидирование полного пакета упражнений выполнено.');
-    } catch (err) {
-        console.error('Ошибка сидирования полного пакета упражнений:', err.message);
-    }
-};
-
-initDatabase().then(async () => {
-    await seedExerciseCatalog();
-    app.listen(PORT, () => console.log(`Сервер на порту ${PORT}`));
-}).catch(err => {
-    console.error('Критическая ошибка:', err);
-    process.exit(1);
-});
