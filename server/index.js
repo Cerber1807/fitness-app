@@ -577,4 +577,7 @@ const seedExerciseCatalog = async () => {
 initDatabase().then(async () => {
     await seedExerciseCatalog();
     app.listen(PORT, () => console.log(`Сервер на порту ${PORT}`));
+}).catch(err => {
+    console.error('Критическая ошибка:', err);
+    process.exit(1);
 });
