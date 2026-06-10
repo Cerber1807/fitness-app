@@ -19,7 +19,6 @@ const gifMap = {
     'Тяга верхнего блока': 'https://media.giphy.com/media/26gR0fjEDs8Cj0pSU/giphy.gif'
 };
 
-// --- НАШ ТАЙМЕР (добавлен просто сверху) ---
 const TimerOverlay = ({ exercise, onClose }) => {
     const [timeLeft, setTimeLeft] = useState(30);
     const [run, setRun] = useState(true);
@@ -174,13 +173,12 @@ const RepsModal = ({ exercise, onClose, onSave }) => {
         </div>
     );
 };
-// --------------------------------------------
 
 const ExerciseList = ({ historyFrom, historyTo }) => {
     const [exercises, setExercises] = useState([]);
     const [filter, setFilter] = useState('Все');
     const [searchText, setSearchText] = useState('');
-    const [activeExercise, setActiveExercise] = useState(null); // <-- состояние для таймера
+    const [activeExercise, setActiveExercise] = useState(null);
     const [repsModalExercise, setRepsModalExercise] = useState(null);
     const [history, setHistory] = useState([]);
     const [records, setRecords] = useState([]);
@@ -315,7 +313,6 @@ const ExerciseList = ({ historyFrom, historyTo }) => {
     return (
         <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
             
-            {/* <-- ВЫЗОВ ТАЙМЕРА или модального окна повторений --> */}
             {activeExercise && <TimerOverlay exercise={activeExercise} onClose={() => setActiveExercise(null)} />}
             {repsModalExercise && (
                 <RepsModal

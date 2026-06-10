@@ -12,11 +12,12 @@ const Login = () => {
         try {
             const res = await axios.post('https://fitness-app-production-f1ff.up.railway.app/login', { email, password });
             
-            // Сохраняем токен и ID пользователя
+            
+            
             localStorage.setItem('token', res.data.token);
             alert("Вход выполнен!");
             
-            // Переходим в профиль
+            
             navigate(`/profile/${res.data.user.id}`);
         } catch (err) {
             alert("Ошибка входа: " + err.response?.data?.message);

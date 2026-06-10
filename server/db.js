@@ -1,15 +1,10 @@
 const { Pool } = require('pg');
 
-// Проверяем, передан ли URI, чтобы сервер не падал молча
-if (!process.env.DATABASE_URI) {
-    console.error("КРИТИЧЕСКАЯ ОШИБКА: Переменная окружения DATABASE_URI не задана!");
-}
-
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URI,
-    ssl: process.env.NODE_ENV === 'production' 
-        ? { rejectUnauthorized: false } 
-        : false // Отключаем SSL для локальной разработки, если нужно
+    connectionString: 'postgresql://postgres:jCOvbyXwZgXmZgNYxXmcoRshXvIskwRx@junction.proxy.rlwy.net:16997/railway',
+    ssl: {
+        rejectUnauthorized: false
+    }
 });
 
 // Перехват ошибок пула, чтобы сервер не падал при скачках сети

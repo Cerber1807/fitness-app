@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom'; // Добавили useParams
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import ExerciseList from './ExerciseList';
 
-const API_URL = 'https://fitness-app-production-f1ff.up.railway.app'; // Убедитесь, что URL правильный и соответствует вашему серверу
+const API_URL = 'https://fitness-app-production-f1ff.up.railway.app';
 
 const Profile = () => {
     const [user, setUser] = useState(null);
@@ -18,7 +18,7 @@ const Profile = () => {
     const [pendingTo, setPendingTo] = useState('');
     const [historyFrom, setHistoryFrom] = useState('');
     const [historyTo, setHistoryTo] = useState('');
-    const { id } = useParams(); // Достаем ID пользователя из URL (например, 12)
+    const { id } = useParams();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -29,7 +29,6 @@ const Profile = () => {
                 return;
             }
             try {
-                // Стучимся по правильному адресу с ID
                 const res = await axios.get(`${API_URL}/profile/${id}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
@@ -39,8 +38,6 @@ const Profile = () => {
                 setWeight(res.data.weight ?? '');
             } catch (err) {
                 console.error("Ошибка загрузки профиля:", err);
-                // Если сервер ответил ошибкой, не выкидываем сразу, а смотрим консоль
-                // navigate('/'); 
             }
         };
 
